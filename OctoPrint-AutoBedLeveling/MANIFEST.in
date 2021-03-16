@@ -1,0 +1,4 @@
+include README.md
+recursive-include octoprint_auto_bed_leveling_with_dial/templates *
+recursive-include octoprint_auto_bed_leveling_with_dial/translations *
+recursive-include octoprint_auto_bed_leveling_with_dial/static *
