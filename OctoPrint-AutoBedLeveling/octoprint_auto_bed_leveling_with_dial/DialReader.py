@@ -34,5 +34,4 @@ if __name__=="__main__":
     dial=Dial()
  
     for i in range(10):
-        sleep(0.01)
         print("Read Dial: %.2fmm" % (dial.read()/100))
