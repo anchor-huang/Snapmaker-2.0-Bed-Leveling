@@ -1,8 +1,8 @@
 ---
 layout: plugin
 
-id: Auto Bed Leveling with Dial
-title: OctoPrint-AutoBedLeveling
+id: dial_mesh_leveling
+title: OctoPrint-DialMeshLeveling
 description: TODO
 authors:
 - Anchor Huang
@@ -11,9 +11,9 @@ license: AGPLv3
 # TODO
 date: today's date in format YYYY-MM-DD, e.g. 2015-04-21
 
-homepage: https://github.com/anchor-huang/Snapmaker-2.0-Bed-Leveling
-source: https://github.com/anchor-huang/Snapmaker-2.0-Bed-Leveling
-archive: https://github.com/anchor-huang/OctoPrint-AutoBedLeveling/archive/master.zip
+homepage: https://github.com/anchor-huang/Snapmaker2-DialMeshLeveling
+source: https://github.com/anchor-huang/Snapmaker2-DialMeshLeveling
+archive: https://github.com/anchor-huang/Snapmaker2-DialMeshLeveling/OctoPrint-DialMeshLeveling/archive/master.zip
 
 # TODO
 # Set this to true if your plugin uses the dependency_links setup parameter to include
@@ -99,4 +99,4 @@ compatibility:
 ---
 
 **TODO**: Longer description of your plugin, configuration examples etc. This part will be visible on the page at
-http://plugins.octoprint.org/plugin/Auto Bed Leveling with Dial/
+http://plugins.octoprint.org/plugin/dial_mesh_leveling/

@@ -1,6 +1,6 @@
 Currently Cookiecutter generates the following helpful extras to this folder:
 
-Auto Bed Leveling with Dial.md
+dial_mesh_leveling.md
     Data file for plugins.octoprint.org. Fill in the missing TODOs once your
     plugin is ready for release and file a PR as described at
     http://plugins.octoprint.org/help/registering/ to get it published.
