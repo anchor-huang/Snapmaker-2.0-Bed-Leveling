@@ -2,6 +2,9 @@
 from __future__ import absolute_import
 
 import octoprint.plugin
+import logging
+from flask import Flask, jsonify
+from .DialReader import Dial
 
 ### (Don't forget to remove me)
 # This is a basic skeleton for your plugin's __init__.py. You probably want to adjust the class name of your plugin
@@ -17,7 +20,21 @@ class Dial_mesh_levelingPlugin(
     octoprint.plugin.SettingsPlugin,
     octoprint.plugin.AssetPlugin,
     octoprint.plugin.TemplatePlugin,
+    octoprint.plugin.BlueprintPlugin
 ):
+
+    def __init__(self):
+        self.prcess_m420_mesh=False
+        self.mesh_data=None
+
+    ##~~ BlueprintPlugin mixin
+    @octoprint.plugin.BlueprintPlugin.route("/get_dail_value", methods=["GET"])
+    def get_dial_value(self):
+        return jsonify({'value': Dial.read()/100})
+    
+    @octoprint.plugin.BlueprintPlugin.route("/get_mesh_data", methods=["GET"])
+    def get_mesh_data(self):
+        return jsonify({'value': self.mesh_data})
 
     ##~~ StartupPlugin mixin
     def on_after_startup(self):
@@ -42,6 +59,38 @@ class Dial_mesh_levelingPlugin(
         )
 
     ##~~ Softwareupdate hook
+    def m420_hook(self, comm_instance, phase, cmd, cmd_type, gcode, *args, **kwargs):
+        if gcode and gcode == "M420" and 'V' in cmd:
+            self.m420_start=True
+            self.m420_output=list()
+            self._logger.info(f'cdm:{cmd}')
+            self._logger.info(f'cmd_type:{cmd_type}')
+            self._logger.info(f'args:{args}')
+            self._logger.info(f'kwargs:{kwargs}')
+        else:
+            self.m420_start=False
+
+
+    def parse_mesh_output(self, comm, line, *args, **kwargs):
+        if self.m420_start:
+            new_line=line.strip('\r\n')
+            if len(new_line)==0:
+                self.m420_start=False
+                self.mesh_data=list()
+                for line in self.m420_output[2:]:
+                    self.mesh_data.append([float(item) for item in line.split()[1:]])                
+                self._logger.info("Parsed Mesh Data: ")
+                self._logger.info(self.mesh_data)
+
+            else:
+                self.m420_output.append(new_line)
+                self._logger.info(f'Received[{new_line}]')
+
+        return line
+    
+    def end_parse_mesh_output(self,comm, parsed_temps ):
+        self.m420_start=False
+        return parsed_temps
 
     def get_update_information(self):
         # Define the configuration for your plugin to use with the Software Update
@@ -60,6 +109,9 @@ class Dial_mesh_levelingPlugin(
                 pip="https://github.com/anchor-huang/OctoPrint-DialMeshLeveling/archive/{target_version}.zip",
             )
         )
+
+
+
 
 
 # If you want your plugin to be registered within OctoPrint under a different name than what you defined in setup.py
@@ -81,5 +133,8 @@ def __plugin_load__():
 
     global __plugin_hooks__
     __plugin_hooks__ = {
-        "octoprint.plugin.softwareupdate.check_config": __plugin_implementation__.get_update_information
+        "octoprint.plugin.softwareupdate.check_config": __plugin_implementation__.get_update_information, 
+        "octoprint.comm.protocol.gcode.received": __plugin_implementation__.parse_mesh_output, 
+        "octoprint.comm.protocol.gcode.sending": __plugin_implementation__.m420_hook, 
+        "octoprint.comm.protocol.temperatures.received": __plugin_implementation__.end_parse_mesh_output
     }

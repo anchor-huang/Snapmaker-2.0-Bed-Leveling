@@ -12,7 +12,7 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setup(READY_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP) # Set pin to be an input pin and set initial value to be pulled low (off)
 
 
-class Dial:
+class DialReader:
     def __init__(self, bus_id=1, address=DIAL_ADDRESS):
         self.i2c=SMBus(bus_id)
         self.addr=address
@@ -26,12 +26,12 @@ class Dial:
         self.i2c.i2c_rdwr(msg)
         return(int.from_bytes(msg, byteorder='little', signed=True))
 
-
+Dial=DialReader()
 
 if __name__=="__main__":
     import sys
     from time import sleep
-    dial=Dial()
+    
  
     for i in range(10):
-        print("Read Dial: %.2fmm" % (dial.read()/100))
+        print("Read Dial: %.2fmm" % (Dial.read()/100))
