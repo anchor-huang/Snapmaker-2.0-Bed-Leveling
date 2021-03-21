@@ -1,0 +1,4 @@
+include README.md
+recursive-include octoprint_dial_mesh_leveling/templates *
+recursive-include octoprint_dial_mesh_leveling/translations *
+recursive-include octoprint_dial_mesh_leveling/static *
