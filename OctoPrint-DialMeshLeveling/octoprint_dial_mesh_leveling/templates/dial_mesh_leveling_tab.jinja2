@@ -1,8 +1,26 @@
 
+<script src="{{ url_for("static", filename="js/lib/jquery/jquery.min.js") }}"></script>
+<script src="{{ url_for("static", filename="js/lib/lodash.min.js") }}"></script>
+<script src="{{ url_for("static", filename="js/lib/sockjs.min.js") }}"></script>
+<!--
+  full client library or all individual files, depending
+  on the server mode - should be the preferred variant
+-->
+{% assets "js_client" %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
+
+
 <div class="container">
 <form class="form-horizontal">
 <fieldset>
 <Legend> Bed Level by Dial Indictor </legend>
+
+<div class="control-group">
+    <label class="control-label" for="dial_value">Dial</label>
+    <div class="controls">
+        <span class="input-xlarge uneditable-input" data-bind="text: dial_value">Null</span>
+        <button class="btn btn-primary" data-bind="click: getDialValue">{{ _('Get Dial Value') }}</button>
+    </div>
+</div>
 
 <div class="control-group">
     <label class="control-label" for="grid_size">Grid Size</label>
