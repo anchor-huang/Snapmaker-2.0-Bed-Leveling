@@ -33,34 +33,16 @@
             <option value="11"> 11x11</option>
         </select>
     </div>
+    <button class="btn btn-primary" data-bind="click: updateMeshData, enable: connected">{{ _('Update Mesh Data') }}</button>
+
 </div>
 
 <label>Mesh Status</label>
+<span class="help-block" data-bind="text: message"></span>
 <span class="help-block">Click the botton to trigger grid alignment </span>
-<div class="row-fluid control-group text-center control-group">
-<div class="row-fluid align-items-center">
-   <div class="span1"> J2</div>
-    <button class="btn span1">1</button>
-    <button class="btn span1">1</button>
-    <button class="btn span1">1</button>
-</div>
-<div class="row-fluid align-items-center">
-    <div class="span1"> J1</div>
-    <button class="btn span1">2</button>
-    <button class="btn span1">2</button>
-    <button class="btn span1">2</button>
-</div>
-<div class="row-fluid align-items-center">
-    <div class="span1"> J0</div>
-    <button class="btn span1">3</button>
-    <button class="btn span1">3</button>
-    <button class="btn span1">3</button>
-</div>
-<div class="row-fluid align-items-center">
-    <div class="span1"> </div>
-    <div class="span1"> I0</div>
-    <div class="span1"> I1</div>
-    <div class="span1"> I2</div>
+<div data-bind="foreach: mesh_data">
+<div class="row-fluid align-items-center" data-bind="foreach: $data">
+    <button class="btn span1" data-bind="text: $data"></button>
 </div>
 </div>
 </fieldset>

@@ -19,7 +19,7 @@ class DialReader:
 
     def read(self):
         self.i2c.write_byte(self.addr, READ_SENSOR_CMD)
-        ret=GPIO.wait_for_edge(READY_PIN, GPIO.FALLING,  timeout=5000)
+        ret=GPIO.wait_for_edge(READY_PIN, GPIO.FALLING,  timeout=1000)
         if ret is None:
             raise TimeoutError
         msg=i2c_msg.read(self.addr, 2)

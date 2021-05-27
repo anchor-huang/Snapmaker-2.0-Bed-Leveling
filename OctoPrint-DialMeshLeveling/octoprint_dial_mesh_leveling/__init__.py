@@ -18,19 +18,23 @@ from .DialReader import Dial
 class Dial_mesh_levelingPlugin(
     octoprint.plugin.StartupPlugin,
     octoprint.plugin.SettingsPlugin,
-    octoprint.plugin.AssetPlugin,
-    octoprint.plugin.TemplatePlugin,
     octoprint.plugin.BlueprintPlugin
 ):
 
     def __init__(self):
         self.prcess_m420_mesh=False
         self.mesh_data=None
+    ##~~ Define custom event 
+    def register_custom_events(*args, **kwargs):
+        return ["mesh_finish_event"]
 
     ##~~ BlueprintPlugin mixin
     @octoprint.plugin.BlueprintPlugin.route("/get_dail_value", methods=["GET"])
     def get_dial_value(self):
-        return jsonify({'value': Dial.read()/100})
+        try:
+            return jsonify({'value': Dial.read()/100})
+        except TimeoutError:
+            return jsonify({'value': None})
     
     @octoprint.plugin.BlueprintPlugin.route("/get_mesh_data", methods=["GET"])
     def get_mesh_data(self):
@@ -38,7 +42,7 @@ class Dial_mesh_levelingPlugin(
 
     ##~~ StartupPlugin mixin
     def on_after_startup(self):
-        self._logger.info("Hello World!")
+        self._logger.info("Dail Mesh Loaded ... ")
 
     ##~~ SettingsPlugin mixin
 
@@ -47,16 +51,6 @@ class Dial_mesh_levelingPlugin(
             # put your plugin's default settings here
         )
 
-    ##~~ AssetPlugin mixin
-
-    def get_assets(self):
-        # Define your plugin's asset files to automatically include in the
-        # core UI here.
-        return dict(
-            js=["js/dial_mesh_leveling.js"],
-            css=["css/dial_mesh_leveling.css"],
-            less=["less/dial_mesh_leveling.less"],
-        )
 
     ##~~ Softwareupdate hook
     def m420_hook(self, comm_instance, phase, cmd, cmd_type, gcode, *args, **kwargs):
@@ -81,6 +75,10 @@ class Dial_mesh_levelingPlugin(
                     self.mesh_data.append([float(item) for item in line.split()[1:]])                
                 self._logger.info("Parsed Mesh Data: ")
                 self._logger.info(self.mesh_data)
+                self._logger.info(f'Fire Event[{octoprint.events.Events.PLUGIN_DIAL_MESH_LEVELING_MESH_FINISH_EVENT}]')
+                self._event_bus.fire(octoprint.events.Events.PLUGIN_DIAL_MESH_LEVELING_MESH_FINISH_EVENT, {
+                 'message': 'Parse mesh data completed.'
+                })
 
             else:
                 self.m420_output.append(new_line)
@@ -136,5 +134,6 @@ def __plugin_load__():
         "octoprint.plugin.softwareupdate.check_config": __plugin_implementation__.get_update_information, 
         "octoprint.comm.protocol.gcode.received": __plugin_implementation__.parse_mesh_output, 
         "octoprint.comm.protocol.gcode.sending": __plugin_implementation__.m420_hook, 
-        "octoprint.comm.protocol.temperatures.received": __plugin_implementation__.end_parse_mesh_output
+        "octoprint.comm.protocol.temperatures.received": __plugin_implementation__.end_parse_mesh_output, 
+        "octoprint.events.register_custom_events": __plugin_implementation__.register_custom_events, 
     }
